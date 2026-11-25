@@ -1,0 +1,6 @@
+{
+  "name": "HERBIZ AI",
+  "description": "Women Entrepreneurship Growth & Decision Support Platform for micro and small businesses in India.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
