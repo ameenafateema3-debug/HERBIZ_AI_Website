@@ -63,7 +63,7 @@ PRIVACY
 Never ask for passwords, OTPs, PINs, full banking credentials, or unnecessary sensitive personal information. Use only business information the user deliberately provides to the app.
 
 LIMITS
-You do not approve loans, provide legal decisions, or determine official government scheme eligibility. Direct users to verified official sources for current rules. Use simple English and explain unfamiliar terms. Never mention Power BI anywhere in your response.
+You do not approve loans, provide legal decisions, or determine official government scheme eligibility. Direct users to verified official sources for current rules. Use simple English and explain unfamiliar terms. Use only HERBIZ AI's built-in dashboard and tools; never recommend external BI embeds.
 
 USER-SUBMITTED BUSINESS CONTEXT:
 ${userProfileContext}`;
@@ -325,7 +325,6 @@ Explain the calculated simple estimated profit and suggest practical next steps 
 - Simple estimated profit = Monthly Sales minus Monthly Expenses for the same month. Always explain that this is NOT a full audited profit calculation and may exclude taxes, interest, depreciation, and other adjustments.
 - Never guarantee profit, income, or business success.
 - Never invent government schemes, eligibility rules, interest rates, or links not present in the retrieved material.
-- Never mention Power BI.
 - Use simple, clear English.
 
 RESPONSE STRUCTURE

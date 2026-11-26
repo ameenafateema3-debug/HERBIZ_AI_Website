@@ -112,10 +112,6 @@ function isExampleQuestionsSection(chunk: KnowledgeChunk): boolean {
   return /^(\d+\.\s*)?example questions/i.test(chunk.sectionTitle.trim());
 }
 
-function isPowerBiOnlySection(chunk: KnowledgeChunk): boolean {
-  return /\bpower\s*bi\b/i.test(chunk.sectionTitle);
-}
-
 function scoreChunk(
   chunk: KnowledgeChunk,
   rawQueryLower: string,
@@ -124,11 +120,6 @@ function scoreChunk(
 ): { score: number; matchedTerms: string[] } {
   // Skip meta "Example questions" bullet lists so actual guidance sections are retrieved
   if (isExampleQuestionsSection(chunk)) {
-    return { score: 0, matchedTerms: [] };
-  }
-
-  // Exclude Power BI-specific section so no Power BI reference surfaces on the website
-  if (isPowerBiOnlySection(chunk)) {
     return { score: 0, matchedTerms: [] };
   }
 

@@ -1,7 +1,17 @@
 import { useState, useRef, useEffect, type FormEvent } from 'react';
-import { Send, RotateCcw, ShieldCheck, ExternalLink, AlertCircle } from 'lucide-react';
-import type { BusinessAssessment, ChatMessage, PageId } from '../types/herbiz';
+import {
+  Send,
+  RotateCcw,
+  ShieldCheck,
+  ExternalLink,
+  AlertCircle,
+  Copy,
+  Check,
+  Loader2,
+} from 'lucide-react';
+import type { BusinessAssessment, ChatMessage, ChatSourceNote, PageId } from '../types/herbiz';
 import ProfileAnalysisCard from '../components/ProfileAnalysisCard';
+import { fetchJson } from '../utils/apiClient';
 
 interface AssistantPageProps {
   userAssessment: BusinessAssessment | null;
@@ -13,7 +23,7 @@ const STARTER_PROMPTS = [
   'How can I promote a home-based business with a small budget?',
   'What is a simple 30-day business improvement plan?',
   'Which official Indian portals should I check for MSME or Startup India schemes?',
-  'Is the 600-record dataset real Indian business survey data?',
+  'How should I separate personal money from business money?',
 ];
 
 export default function AssistantPage({ userAssessment, onNavigate }: AssistantPageProps) {
@@ -35,18 +45,33 @@ export default function AssistantPage({ userAssessment, onNavigate }: AssistantP
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [lastFailedPrompt, setLastFailedPrompt] = useState<string | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, loading]);
 
+  const handleCopyResponse = async (id: string, content: string) => {
+    try {
+      await navigator.clipboard.writeText(content);
+      setCopiedId(id);
+      setTimeout(() => {
+        setCopiedId((prev) => (prev === id ? null : prev));
+      }, 2200);
+    } catch {
+      setErrorMsg('Clipboard copy was blocked by your browser. Please select and copy the text.');
+    }
+  };
+
   const sendMessage = async (textToSend: string, isRetry = false) => {
     const trimmed = textToSend.trim();
     if (!trimmed || loading) return;
 
     setErrorMsg(null);
-    setLastFailedPrompt(null);
+    if (!isRetry) {
+      setLastFailedPrompt(null);
+    }
 
     let nextMessages = messages;
     if (!isRetry) {
@@ -67,19 +92,21 @@ export default function AssistantPage({ userAssessment, onNavigate }: AssistantP
         .filter((m) => m.id !== 'welcome-msg')
         .map((m) => ({ role: m.role, content: m.content }));
 
-      const response = await fetch('/api/chat', {
+      const data = await fetchJson<{
+        reply: string;
+        matchedTopics?: string[];
+        sourceNotes?: ChatSourceNote[];
+        retrievedExcerpts?: Array<{ area: string; section: string; score: number; preview: string }>;
+        insufficientKnowledge?: boolean;
+        fallbackUsed?: boolean;
+        referencedResources?: Array<{ title: string; url: string }>;
+      }>('/api/chat', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messages: apiMessages,
           userProfile: realUserProfile,
         }),
       });
-
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || 'Unable to get a response from HERBIZ AI.');
-      }
 
       const assistantMsg: ChatMessage = {
         id: `assistant-${Date.now()}`,
@@ -95,12 +122,13 @@ export default function AssistantPage({ userAssessment, onNavigate }: AssistantP
       };
 
       setMessages((prev) => [...prev, assistantMsg]);
+      setLastFailedPrompt(null);
     } catch (err: unknown) {
       setLastFailedPrompt(trimmed);
       setErrorMsg(
         err instanceof Error
           ? err.message
-          : 'Could not reach the server-side Gemini assistant. Please try again.'
+          : 'We could not reach the HERBIZ AI assistant right now. Please click Retry or try again in a moment.'
       );
     } finally {
       setLoading(false);
@@ -115,13 +143,14 @@ export default function AssistantPage({ userAssessment, onNavigate }: AssistantP
   const handleResetChat = () => {
     setErrorMsg(null);
     setLastFailedPrompt(null);
+    setCopiedId(null);
     setMessages([
       {
         id: 'welcome-msg',
         role: 'assistant',
         content: realUserProfile
-          ? `Chat cleared. Your submitted profile (${realUserProfile.businessName || realUserProfile.businessCategory}) is still active if you want to ask about it.`
-          : 'Chat cleared. How can I help with your business today?',
+          ? `Conversation cleared. Your submitted profile (${realUserProfile.businessName || realUserProfile.businessCategory}) is still active if you want to ask about it.`
+          : 'Conversation cleared. How can I help with your business today?',
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       },
     ]);
@@ -144,10 +173,11 @@ export default function AssistantPage({ userAssessment, onNavigate }: AssistantP
         <button
           type="button"
           onClick={handleResetChat}
-          className="inline-flex min-h-[40px] items-center gap-1.5 self-start rounded-lg border border-purple-200 bg-white px-3.5 py-2 text-xs font-semibold text-purple-900 hover:bg-purple-50 whitespace-nowrap shrink-0"
+          disabled={loading}
+          className="inline-flex min-h-[40px] items-center gap-1.5 self-start rounded-lg border border-purple-200 bg-white px-3.5 py-2 text-xs font-semibold text-purple-900 hover:bg-purple-50 disabled:opacity-50 whitespace-nowrap shrink-0"
         >
           <RotateCcw className="h-3.5 w-3.5" />
-          <span>New Conversation</span>
+          <span>Clear Conversation</span>
         </button>
       </div>
 
@@ -200,6 +230,7 @@ export default function AssistantPage({ userAssessment, onNavigate }: AssistantP
         <div className="h-[340px] sm:h-[430px] overflow-y-auto p-4 sm:p-6 space-y-4">
           {messages.map((msg) => {
             const isUser = msg.role === 'user';
+            const isCopied = copiedId === msg.id;
             return (
               <div
                 key={msg.id}
@@ -259,10 +290,32 @@ export default function AssistantPage({ userAssessment, onNavigate }: AssistantP
                   )}
                 </div>
 
-                <div className="mt-1 flex flex-wrap items-center gap-2 px-1 text-xs text-slate-600">
+                <div className="mt-1.5 flex flex-wrap items-center gap-2 px-1 text-xs text-slate-600">
                   <span>{isUser ? 'You' : 'HERBIZ AI'}</span>
                   <span aria-hidden="true">·</span>
                   <span>{msg.timestamp}</span>
+                  {!isUser && (
+                    <>
+                      <span aria-hidden="true">·</span>
+                      <button
+                        type="button"
+                        onClick={() => void handleCopyResponse(msg.id, msg.content)}
+                        className="inline-flex items-center gap-1 font-medium text-purple-800 hover:text-purple-950"
+                      >
+                        {isCopied ? (
+                          <>
+                            <Check className="h-3 w-3 text-emerald-700" />
+                            <span className="text-emerald-800">Copied</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="h-3 w-3" />
+                            <span>Copy response</span>
+                          </>
+                        )}
+                      </button>
+                    </>
+                  )}
                   {!isUser && msg.sourceNotes && msg.sourceNotes.length > 0 && (
                     <>
                       <span aria-hidden="true">·</span>
@@ -277,9 +330,10 @@ export default function AssistantPage({ userAssessment, onNavigate }: AssistantP
           })}
 
           {loading && (
-            <div className="flex items-start">
-              <div className="rounded-xl border border-purple-100 bg-purple-50/50 px-4 py-3 text-sm text-purple-900">
-                Thinking through HERBIZ guidance...
+            <div className="flex items-start" aria-live="polite">
+              <div className="inline-flex items-center gap-2.5 rounded-xl border border-purple-200 bg-purple-50/70 px-4 py-3 text-sm text-purple-900">
+                <Loader2 className="h-4 w-4 animate-spin text-purple-800" />
+                <span>Searching HERBIZ knowledge library and preparing guidance...</span>
               </div>
             </div>
           )}
@@ -299,10 +353,12 @@ export default function AssistantPage({ userAssessment, onNavigate }: AssistantP
             {lastFailedPrompt && (
               <button
                 type="button"
+                disabled={loading}
                 onClick={() => void sendMessage(lastFailedPrompt, true)}
-                className="rounded-md bg-red-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-800 whitespace-nowrap shrink-0"
+                className="inline-flex items-center gap-1 rounded-md bg-red-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-800 disabled:opacity-50 whitespace-nowrap shrink-0"
               >
-                Retry
+                <RotateCcw className="h-3 w-3" />
+                <span>Retry</span>
               </button>
             )}
           </div>
@@ -353,8 +409,17 @@ export default function AssistantPage({ userAssessment, onNavigate }: AssistantP
             disabled={loading || input.trim().length === 0}
             className="inline-flex min-h-[44px] items-center gap-2 rounded-lg bg-purple-800 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-purple-900 disabled:opacity-50 whitespace-nowrap shrink-0"
           >
-            <span>Send</span>
-            <Send className="h-4 w-4" />
+            {loading ? (
+              <>
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Sending...</span>
+              </>
+            ) : (
+              <>
+                <span>Send</span>
+                <Send className="h-4 w-4" />
+              </>
+            )}
           </button>
         </form>
       </div>

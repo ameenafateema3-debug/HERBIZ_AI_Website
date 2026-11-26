@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { CheckCircle2, ShieldAlert, Clock } from 'lucide-react';
+import { fetchJson } from '../utils/apiClient';
 
 const FEEDBACK_CATEGORIES = [
   'General Experience',
@@ -57,9 +58,14 @@ export default function FeedbackPage() {
 
     setSubmitting(true);
     try {
-      const response = await fetch('/api/feedback', {
+      const data = await fetchJson<{
+        referenceId: string;
+        category?: string;
+        rating?: number;
+        mostUsefulArea?: string;
+        note: string;
+      }>('/api/feedback', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           category,
           rating,
@@ -67,10 +73,6 @@ export default function FeedbackPage() {
           comments: comments.trim(),
         }),
       });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || 'Could not submit feedback right now.');
-      }
 
       setConfirmation({
         referenceId: data.referenceId,

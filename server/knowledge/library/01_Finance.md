@@ -98,7 +98,7 @@ When a user asks a finance question:
 
 ## 9. Dataset and honesty rules
 
-The HERBIZ AI demonstration dataset contains 600 fictional/sample entrepreneur records. Treat its values as simulated project data. Never describe them as verified Indian business statistics, actual survey results, actual loan approvals or audited financial statements. If showing a dashboard figure, label it as **sample dataset result**. Do not invent missing values or claim that a bank account, accounting system or Power BI report is connected unless the application genuinely retrieves that information.
+The HERBIZ AI demonstration dataset contains 600 fictional/sample entrepreneur records. Treat its values as simulated project data. Never describe them as verified Indian business statistics, actual survey results, actual loan approvals or audited financial statements. If showing a dashboard figure, label it as **sample dataset result**. Do not invent missing values or claim that a bank account, accounting system, or external analytics report is connected unless the application genuinely retrieves that information.
 
 ## 10. Example questions the chatbot can answer
 

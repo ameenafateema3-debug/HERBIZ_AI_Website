@@ -18,7 +18,7 @@ export default function Footer({ onNavigate }: FooterProps) {
             <p className="font-display text-base font-bold text-purple-950">HERBIZ AI</p>
             <p className="mt-2 text-sm leading-relaxed text-slate-600 max-w-sm">
               Empowering Women Entrepreneurs Through Intelligent Insights. A student decision-support
-              prototype built for women running micro and small businesses in India.
+              platform built for women starting and running micro and small businesses in India.
             </p>
           </div>
 
@@ -28,11 +28,23 @@ export default function Footer({ onNavigate }: FooterProps) {
               <button type="button" onClick={() => handleSelect('home')} className="text-left hover:text-purple-900">
                 Home
               </button>
-              <button type="button" onClick={() => handleSelect('about')} className="text-left hover:text-purple-900">
-                About
+              <button type="button" onClick={() => handleSelect('dashboard')} className="text-left hover:text-purple-900">
+                Dashboard
+              </button>
+              <button type="button" onClick={() => handleSelect('idea-finder')} className="text-left hover:text-purple-900">
+                Idea Finder
+              </button>
+              <button type="button" onClick={() => handleSelect('plan-generator')} className="text-left hover:text-purple-900">
+                Plan Generator
+              </button>
+              <button type="button" onClick={() => handleSelect('calculator')} className="text-left hover:text-purple-900">
+                Profit Calculator
+              </button>
+              <button type="button" onClick={() => handleSelect('marketing-assistant')} className="text-left hover:text-purple-900">
+                Marketing AI
               </button>
               <button type="button" onClick={() => handleSelect('assessment')} className="text-left hover:text-purple-900">
-                Business Assessment
+                Assessment
               </button>
               <button type="button" onClick={() => handleSelect('assistant')} className="text-left hover:text-purple-900">
                 AI Assistant
@@ -40,20 +52,23 @@ export default function Footer({ onNavigate }: FooterProps) {
               <button type="button" onClick={() => handleSelect('recommendations')} className="text-left hover:text-purple-900">
                 Recommendations
               </button>
+              <button type="button" onClick={() => handleSelect('action-plan')} className="text-left hover:text-purple-900">
+                Progress Tracker
+              </button>
               <button type="button" onClick={() => handleSelect('resources')} className="text-left hover:text-purple-900">
                 Verified Resources
               </button>
-              <button type="button" onClick={() => handleSelect('action-plan')} className="text-left hover:text-purple-900">
-                Action Plan
-              </button>
               <button type="button" onClick={() => handleSelect('feedback')} className="text-left hover:text-purple-900">
                 Feedback
+              </button>
+              <button type="button" onClick={() => handleSelect('about')} className="text-left hover:text-purple-900">
+                About
               </button>
             </div>
           </div>
 
           <div>
-            <p className="font-display text-sm font-semibold text-purple-950">Important Scope & Privacy</p>
+            <p className="font-display text-sm font-semibold text-purple-950">Important Scope &amp; Privacy</p>
             <p className="mt-2 text-sm leading-relaxed text-slate-600">
               HERBIZ AI is a decision-support prototype—not a loan approval service, certified
               accountant, lawyer, or official government eligibility checker. Never enter passwords,

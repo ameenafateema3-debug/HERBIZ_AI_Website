@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { ExternalLink, ShieldAlert } from 'lucide-react';
 import type { ResourceCategory, VerifiedResource } from '../types/herbiz';
+import { fetchJson } from '../utils/apiClient';
 
 const CATEGORY_TABS: Array<{ id: 'all' | ResourceCategory; label: string }> = [
   { id: 'all', label: 'All Portals' },
@@ -21,11 +22,9 @@ export default function ResourcesPage() {
     setLoading(true);
     setErrorMsg(null);
     try {
-      const response = await fetch('/api/resources');
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || 'Could not fetch verified resources.');
-      }
+      const data = await fetchJson<{ resources?: VerifiedResource[]; disclaimer?: string }>(
+        '/api/resources'
+      );
       setResources(data.resources ?? []);
       setDisclaimer(data.disclaimer ?? '');
     } catch (err: unknown) {

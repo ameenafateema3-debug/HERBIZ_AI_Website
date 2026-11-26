@@ -3,6 +3,7 @@ import { ShieldAlert, CheckCircle2, Sparkles, Calculator, Clock } from 'lucide-r
 import type { BusinessAssessment, PageId, RecommendationResult } from '../types/herbiz';
 import { FICTIONAL_SAMPLE_PROFILE } from '../data/sampleDemoProfile';
 import ProfileAnalysisCard from '../components/ProfileAnalysisCard';
+import { fetchJson } from '../utils/apiClient';
 
 interface AssessmentPageProps {
   currentAssessment: BusinessAssessment | null;
@@ -310,15 +311,10 @@ export default function AssessmentPage({
 
     setLoading(true);
     try {
-      const response = await fetch('/api/recommendations', {
+      const data = await fetchJson<{ recommendation: RecommendationResult }>('/api/recommendations', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || 'Could not generate assessment recommendations.');
-      }
       onSubmitAssessment(payload, data.recommendation);
       setSubmittedSummary({
         assessment: payload,

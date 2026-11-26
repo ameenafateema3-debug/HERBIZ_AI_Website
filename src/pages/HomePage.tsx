@@ -1,11 +1,16 @@
 import { useState } from 'react';
 import {
   ArrowRight,
-  ClipboardList,
-  MessageSquareText,
-  Compass,
+  BarChart3,
   BookOpenCheck,
+  Calculator,
   CheckSquare,
+  ClipboardList,
+  Compass,
+  FileText,
+  Lightbulb,
+  Megaphone,
+  MessageSquareText,
 } from 'lucide-react';
 import type { PageId } from '../types/herbiz';
 import heroWomanImg from '../assets/images/hero_woman_entrepreneur_1795618493048.jpg';
@@ -21,66 +26,94 @@ const FEATURES: Array<{
   icon: typeof ClipboardList;
 }> = [
   {
+    id: 'idea-finder',
+    title: 'AI Business Idea Finder',
+    description:
+      'Enter your budget, skills, preferred business category, and home or shop setup to discover realistic micro-business ideas.',
+    icon: Lightbulb,
+  },
+  {
+    id: 'plan-generator',
+    title: 'AI Business Plan Generator',
+    description:
+      'Build a structured 8-section business plan including startup costs, marketing strategy, and a 30-day action plan.',
+    icon: FileText,
+  },
+  {
+    id: 'calculator',
+    title: 'Profit & Budget Calculator',
+    description:
+      'Calculate total monthly expenses, estimated monthly profit, profit margin, and break-even sales in seconds.',
+    icon: Calculator,
+  },
+  {
+    id: 'marketing-assistant',
+    title: 'AI Marketing Assistant',
+    description:
+      'Generate Instagram captions, WhatsApp messages, product descriptions, business slogans, and outreach ideas.',
+    icon: Megaphone,
+  },
+  {
+    id: 'dashboard',
+    title: 'HERBIZ Business Dashboard',
+    description:
+      'Review your own entered monthly numbers, goals, and task progress directly inside HERBIZ AI.',
+    icon: BarChart3,
+  },
+  {
+    id: 'action-plan',
+    title: 'Business Progress Tracker',
+    description:
+      'Set business goals, track tasks with priorities, and monitor completion percentage saved locally in your browser.',
+    icon: CheckSquare,
+  },
+  {
     id: 'assessment',
     title: 'Business Assessment',
     description:
-      'Enter your business stage, monthly sales, monthly expenses, digital tools, and primary challenge in a safe, simple form.',
+      'Share your business stage, monthly sales, monthly expenses, and main challenge for structured recommendations.',
     icon: ClipboardList,
   },
   {
     id: 'assistant',
     title: 'HERBIZ AI Assistant',
     description:
-      'Ask practical questions in plain English and get structured guidance grounded in HERBIZ micro-business knowledge.',
+      'Ask practical questions in plain English and get answers grounded in HERBIZ micro-business knowledge.',
     icon: MessageSquareText,
-  },
-  {
-    id: 'recommendations',
-    title: 'Actionable Recommendations',
-    description:
-      'Review possible causes, simple estimated profit, practical suggestions, priority level, and one clear next step.',
-    icon: Compass,
   },
   {
     id: 'resources',
     title: 'Verified India Resources',
     description:
-      'Explore checked official government portals for Udyam registration, finance pathways, mentorship, and skill training.',
+      'Explore checked official government portals for Udyam registration, finance pathways, mentorship, and training.',
     icon: BookOpenCheck,
-  },
-  {
-    id: 'action-plan',
-    title: 'Weekly Action Plan',
-    description:
-      'Break your business goals into weekly tasks with target dates and track progress from Not Started to Completed.',
-    icon: CheckSquare,
   },
 ];
 
 const HOW_IT_WORKS = [
   {
     step: '01',
-    title: 'Share Your Business Snapshot',
+    title: 'Discover & Plan Your Idea',
     detail:
-      'Fill in the short Business Assessment with your category, sales, expenses, and current challenge—no passwords or bank details ever requested.',
+      'Start with the AI Business Idea Finder and Business Plan Generator—or fill the Business Assessment for an active business.',
   },
   {
     step: '02',
-    title: 'Review Tailored Insights',
+    title: 'Check Monthly Numbers',
     detail:
-      'See simple estimated profit (sales minus expenses for the same month), possible causes behind your main challenge, and a focused next step.',
+      'Use the Profit & Budget Calculator to review estimated monthly expenses, profit margin, and break-even sales.',
   },
   {
     step: '03',
-    title: 'Ask Questions in Plain English',
+    title: 'Promote & Ask HERBIZ AI',
     detail:
-      'Chat with the Gemini-powered HERBIZ AI Assistant to explore pricing, marketing photos, record keeping, or safe digital habits.',
+      'Create WhatsApp and Instagram marketing copy, or ask the Gemini-powered HERBIZ AI Assistant any practical question.',
   },
   {
     step: '04',
-    title: 'Act & Verify Official Portals',
+    title: 'Track Goals & Official Portals',
     detail:
-      'Save concrete weekly tasks to your Action Plan and open verified government portals directly when exploring schemes or registration.',
+      'Track your goals and tasks in the Business Progress Tracker and verify official Indian government portals directly.',
   },
 ];
 
@@ -95,7 +128,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
           <div className="grid items-stretch gap-10 lg:grid-cols-12">
             <div className="flex flex-col justify-center lg:col-span-6">
               <p className="text-xs font-medium tracking-wide text-purple-800">
-                Women Entrepreneurship Growth & Decision Support Platform
+                Women Entrepreneurship Growth &amp; Decision Support Platform
               </p>
 
               <h1 className="font-display mt-3 text-4xl font-bold tracking-tight text-purple-950 sm:text-5xl leading-[1.12] [text-wrap:balance]">
@@ -107,19 +140,19 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               </p>
 
               <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-700">
-                Designed for women running micro and small businesses in India, HERBIZ AI brings
-                together a structured business assessment, a practical AI business assistant,
-                verified government resource links, and a simple weekly action planner in one
-                approachable space.
+                Designed for women running or starting micro and small businesses in India, HERBIZ
+                AI brings together an AI business idea finder, business plan generator, profit
+                calculator, marketing assistant, progress tracker, verified government portals, and
+                a grounded AI advisor in one approachable space.
               </p>
 
               <div className="mt-7 flex flex-wrap items-center gap-4">
                 <button
                   type="button"
-                  onClick={() => onNavigate('assessment')}
+                  onClick={() => onNavigate('dashboard')}
                   className="inline-flex min-h-[44px] items-center gap-2 rounded-lg bg-purple-800 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-purple-900 whitespace-nowrap shrink-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-purple-700"
                 >
-                  <span>Get Started</span>
+                  <span>Open Workspace Dashboard</span>
                   <ArrowRight className="h-4 w-4" />
                 </button>
 
@@ -155,7 +188,8 @@ export default function HomePage({ onNavigate }: HomePageProps) {
                       HERBIZ AI Decision Support
                     </p>
                     <p className="mt-1 text-sm text-slate-600 max-w-xs">
-                      Clear steps for finances, marketing, digital tools, and verified support.
+                      Clear steps for ideas, business plans, finances, marketing, and verified
+                      support.
                     </p>
                   </div>
                 )}
@@ -172,19 +206,18 @@ export default function HomePage({ onNavigate }: HomePageProps) {
             Practical Tools Built for Everyday Micro-Business Decisions
           </h2>
           <p className="mt-2.5 text-base leading-relaxed text-slate-600">
-            Start with a quick assessment or explore verified official portals and weekly planning
-            tools at your own pace.
+            Explore AI planning tools, budget calculations, marketing templates, and verified
+            official India portals at your own pace.
           </p>
         </div>
 
         <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {FEATURES.map((feature, index) => {
+          {FEATURES.map((feature) => {
             const Icon = feature.icon;
-            const spanClass = index === 0 ? 'lg:col-span-2 bg-purple-50/40' : 'bg-white';
             return (
               <div
                 key={feature.id}
-                className={`flex flex-col justify-between rounded-xl border border-purple-100 p-6 transition-colors hover:border-purple-300 ${spanClass}`}
+                className="flex flex-col justify-between rounded-xl border border-purple-100 bg-white p-6 transition-colors hover:border-purple-300"
               >
                 <div>
                   <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-pink-50 text-purple-800 border border-pink-100">
@@ -222,7 +255,7 @@ export default function HomePage({ onNavigate }: HomePageProps) {
               How It Works
             </h2>
             <p className="mt-2 text-base text-slate-600">
-              Four clear steps from entering your business context to planning next week’s actions.
+              Four clear steps from finding a business idea to tracking daily progress.
             </p>
           </div>
 

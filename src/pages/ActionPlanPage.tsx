@@ -1,10 +1,26 @@
 import { useState, type FormEvent } from 'react';
-import { Plus, Trash2, Sparkles, Clock, CheckCircle2, Circle } from 'lucide-react';
-import type { ActionPlanTask, RecommendationPriority, TaskStatus } from '../types/herbiz';
+import {
+  Plus,
+  Trash2,
+  Sparkles,
+  CheckCircle2,
+  Circle,
+  Target,
+  HardDrive,
+} from 'lucide-react';
+import type {
+  ActionPlanTask,
+  BusinessGoal,
+  RecommendationPriority,
+  TaskStatus,
+} from '../types/herbiz';
 import { FICTIONAL_SAMPLE_ACTION_TASKS } from '../data/sampleDemoProfile';
 
 interface ActionPlanPageProps {
+  goals: BusinessGoal[];
   tasks: ActionPlanTask[];
+  onAddGoal: (goal: Omit<BusinessGoal, 'id' | 'createdAt'>) => void;
+  onDeleteGoal: (id: string) => void;
   onAddTask: (task: Omit<ActionPlanTask, 'id' | 'createdAt'>) => void;
   onUpdateStatus: (id: string, status: TaskStatus) => void;
   onDeleteTask: (id: string) => void;
@@ -19,6 +35,7 @@ const FOCUS_AREAS = [
   'Digital Adoption',
   'Operations & Capacity',
   'Registration & Resources',
+  'Business Launch Prep',
 ];
 
 const PRIORITY_OPTIONS: RecommendationPriority[] = ['High', 'Medium', 'Low'];
@@ -35,15 +52,26 @@ function getPriorityBadgeStyle(priority: RecommendationPriority): string {
 }
 
 export default function ActionPlanPage({
+  goals,
   tasks,
+  onAddGoal,
+  onDeleteGoal,
   onAddTask,
   onUpdateStatus,
   onDeleteTask,
   onLoadSampleTasks,
   onClearSampleTasks,
 }: ActionPlanPageProps) {
+  // Goal state
+  const [goalTitle, setGoalTitle] = useState('');
+  const [goalCategory, setGoalCategory] = useState(FOCUS_AREAS[0]);
+  const [goalTargetDate, setGoalTargetDate] = useState('');
+  const [goalError, setGoalError] = useState<string | null>(null);
+
+  // Task state
   const [title, setTitle] = useState('');
   const [focusArea, setFocusArea] = useState(FOCUS_AREAS[0]);
+  const [selectedGoalId, setSelectedGoalId] = useState<string>('');
   const [targetDate, setTargetDate] = useState('');
   const [priority, setPriority] = useState<RecommendationPriority>('High');
   const [status, setStatus] = useState<TaskStatus>('Not started');
@@ -51,6 +79,27 @@ export default function ActionPlanPage({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const hasSampleTasks = tasks.some((t) => t.isSample);
+
+  const handleGoalSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    setGoalError(null);
+    if (goalTitle.trim().length < 4) {
+      setGoalError('Please enter a business goal title (at least 4 characters).');
+      return;
+    }
+    if (!goalTargetDate) {
+      setGoalError('Please select a target date for your goal.');
+      return;
+    }
+    onAddGoal({
+      title: goalTitle.trim(),
+      category: goalCategory,
+      targetDate: goalTargetDate,
+      isSample: false,
+    });
+    setGoalTitle('');
+    setGoalTargetDate('');
+  };
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -71,6 +120,7 @@ export default function ActionPlanPage({
       targetDate,
       priority,
       status,
+      goalId: selectedGoalId || undefined,
       isSample: false,
     });
 
@@ -101,13 +151,13 @@ export default function ActionPlanPage({
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs font-medium text-purple-800">Weekly Execution Tracker</p>
+          <p className="text-xs font-medium text-purple-800">Goals &amp; Weekly Execution</p>
           <h1 className="font-display mt-1 text-3xl font-bold tracking-tight text-purple-950">
-            Action Plan
+            Business Progress Tracker
           </h1>
           <p className="mt-1.5 max-w-2xl text-sm text-slate-600">
-            Organize practical next steps with a target date, priority, and status, and track your
-            completed progress during this session.
+            Set business goals, add actionable tasks with target dates and priorities, mark tasks
+            completed, and track your completion percentage.
           </p>
         </div>
 
@@ -133,29 +183,32 @@ export default function ActionPlanPage({
         </div>
       </div>
 
-      {/* Explicit Session-Only Storage Notice */}
+      {/* Browser localStorage Notice */}
       <div className="mt-6 flex items-start gap-3 rounded-xl border border-purple-200 bg-purple-50/60 p-4 text-xs sm:text-sm leading-relaxed text-slate-700">
-        <Clock className="mt-0.5 h-5 w-5 shrink-0 text-purple-800" />
+        <HardDrive className="mt-0.5 h-5 w-5 shrink-0 text-purple-800" />
         <div>
           <p className="font-semibold text-purple-950">
-            Session-Only Prototype Storage (No Database Connected)
+            Saved Locally in This Browser (localStorage)
           </p>
           <p className="mt-0.5">
-            No database is connected to this prototype. Tasks you add or update here are stored only
-            for your current browser session and may disappear when the page is refreshed or closed.
+            Because no cloud database is connected, your business goals and tasks are saved locally in
+            this browser’s storage so they remain after refreshing. Locally saved progress will not
+            automatically sync across different devices or browsers.
           </p>
         </div>
       </div>
 
-      {/* Simple Progress Count & Status Breakdown */}
+      {/* Progress Summary */}
       <div className="mt-6 rounded-xl border border-purple-100 bg-white p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
-            <p className="text-xs font-semibold text-purple-950">Progress Summary</p>
+            <p className="text-xs font-semibold text-purple-950">Overall Progress</p>
             <p className="mt-0.5 text-sm font-medium text-slate-700">
               <span className="font-mono-num font-bold text-purple-950">{counts.completed}</span> of{' '}
               <span className="font-mono-num font-bold text-purple-950">{counts.total}</span>{' '}
-              {counts.total === 1 ? 'task' : 'tasks'} completed ({completionPercent}%)
+              {counts.total === 1 ? 'task' : 'tasks'} completed ({completionPercent}%) ·{' '}
+              <span className="font-mono-num font-bold text-purple-950">{goals.length}</span>{' '}
+              {goals.length === 1 ? 'goal' : 'goals'} set
             </p>
           </div>
           <span className="font-mono-num rounded-md border border-purple-200 bg-purple-50 px-3 py-1 text-xs font-bold text-purple-950">
@@ -169,7 +222,7 @@ export default function ActionPlanPage({
           aria-valuenow={completionPercent}
           aria-valuemin={0}
           aria-valuemax={100}
-          aria-label="Action plan completion progress"
+          aria-label="Business progress completion percentage"
         >
           <div
             className="h-full rounded-full bg-purple-800 transition-all duration-300"
@@ -204,6 +257,130 @@ export default function ActionPlanPage({
           </div>
         </div>
       </div>
+
+      {/* Business Goals Section */}
+      <section className="mt-6 rounded-xl border border-purple-100 bg-white p-6">
+        <div className="flex items-center gap-2">
+          <Target className="h-5 w-5 text-purple-800" />
+          <h2 className="font-display text-base font-bold text-purple-950">
+            Set Business Goals
+          </h2>
+        </div>
+
+        <form
+          noValidate
+          onSubmit={handleGoalSubmit}
+          className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-12"
+        >
+          <div className="sm:col-span-5">
+            <label htmlFor="goalTitle" className="block text-xs font-medium text-slate-700">
+              Goal Title <span className="text-purple-700">*</span>
+            </label>
+            <input
+              id="goalTitle"
+              type="text"
+              value={goalTitle}
+              onChange={(e) => setGoalTitle(e.target.value)}
+              placeholder="e.g., Reach 30 regular tiffin subscribers"
+              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-200"
+            />
+          </div>
+
+          <div className="sm:col-span-3">
+            <label htmlFor="goalCategory" className="block text-xs font-medium text-slate-700">
+              Category
+            </label>
+            <select
+              id="goalCategory"
+              value={goalCategory}
+              onChange={(e) => setGoalCategory(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-200"
+            >
+              {FOCUS_AREAS.map((area) => (
+                <option key={area} value={area}>
+                  {area}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="sm:col-span-2">
+            <label htmlFor="goalDate" className="block text-xs font-medium text-slate-700">
+              Target Date <span className="text-purple-700">*</span>
+            </label>
+            <input
+              id="goalDate"
+              type="date"
+              value={goalTargetDate}
+              onChange={(e) => setGoalTargetDate(e.target.value)}
+              className="font-mono-num mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 focus:border-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-200"
+            />
+          </div>
+
+          <div className="flex items-end sm:col-span-2">
+            <button
+              type="submit"
+              className="inline-flex min-h-[38px] w-full items-center justify-center gap-1.5 rounded-lg bg-purple-800 px-3 py-2 text-xs font-semibold text-white hover:bg-purple-900 whitespace-nowrap"
+            >
+              <Plus className="h-4 w-4" />
+              <span>Add Goal</span>
+            </button>
+          </div>
+        </form>
+
+        {goalError && (
+          <p role="alert" className="mt-2.5 text-xs text-red-700">
+            {goalError}
+          </p>
+        )}
+
+        {goals.length > 0 ? (
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {goals.map((goal) => {
+              const linkedTasks = tasks.filter((t) => t.goalId === goal.id);
+              const linkedDone = linkedTasks.filter((t) => t.status === 'Completed').length;
+              const goalPct =
+                linkedTasks.length > 0
+                  ? Math.round((linkedDone / linkedTasks.length) * 100)
+                  : null;
+              return (
+                <div
+                  key={goal.id}
+                  className="flex items-start justify-between gap-3 rounded-lg border border-purple-100 bg-purple-50/30 p-3.5"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs text-purple-800 font-medium">
+                      {goal.category} · <span className="font-mono-num">By {goal.targetDate}</span>
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-purple-950">{goal.title}</p>
+                    {goalPct !== null ? (
+                      <p className="mt-1 text-xs text-slate-600">
+                        {linkedDone}/{linkedTasks.length} linked tasks done ({goalPct}%)
+                      </p>
+                    ) : (
+                      <p className="mt-1 text-xs text-slate-500">
+                        Link tasks below to track this goal’s percentage
+                      </p>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => onDeleteGoal(goal.id)}
+                    aria-label={`Delete goal ${goal.title}`}
+                    className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-purple-200 bg-white text-slate-500 hover:border-red-200 hover:bg-red-50 hover:text-red-700"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="mt-4 text-xs text-slate-500">
+            No goals set yet. Add a monthly or quarterly business goal above.
+          </p>
+        )}
+      </section>
 
       {/* Add Task Form */}
       <form
@@ -288,7 +465,7 @@ export default function ActionPlanPage({
             </select>
           </div>
 
-          <div className="sm:col-span-2 lg:col-span-2">
+          <div className="lg:col-span-2">
             <label htmlFor="focusArea" className="block text-xs font-medium text-slate-700">
               Focus Area
             </label>
@@ -305,6 +482,27 @@ export default function ActionPlanPage({
               ))}
             </select>
           </div>
+
+          {goals.length > 0 && (
+            <div className="sm:col-span-2 lg:col-span-6">
+              <label htmlFor="linkGoal" className="block text-xs font-medium text-slate-700">
+                Link to Business Goal (Optional)
+              </label>
+              <select
+                id="linkGoal"
+                value={selectedGoalId}
+                onChange={(e) => setSelectedGoalId(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-200"
+              >
+                <option value="">No linked goal</option>
+                {goals.map((g) => (
+                  <option key={g.id} value={g.id}>
+                    {g.title}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
 
         <div className="mt-4 flex justify-end">
@@ -356,6 +554,9 @@ export default function ActionPlanPage({
         ) : (
           filteredTasks.map((task) => {
             const isCompleted = task.status === 'Completed';
+            const linkedGoal = task.goalId
+              ? goals.find((g) => g.id === task.goalId)
+              : undefined;
             return (
               <div
                 key={task.id}
@@ -395,6 +596,12 @@ export default function ActionPlanPage({
                       <span className="font-medium text-purple-800">{task.focusArea}</span>
                       <span aria-hidden="true">·</span>
                       <span className="font-mono-num">Due {task.targetDate}</span>
+                      {linkedGoal && (
+                        <>
+                          <span aria-hidden="true">·</span>
+                          <span className="text-purple-900">Goal: {linkedGoal.title}</span>
+                        </>
+                      )}
                       {task.isSample && (
                         <>
                           <span aria-hidden="true">·</span>

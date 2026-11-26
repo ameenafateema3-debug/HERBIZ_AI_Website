@@ -1,5 +1,10 @@
 export type PageId =
   | 'home'
+  | 'dashboard'
+  | 'idea-finder'
+  | 'plan-generator'
+  | 'calculator'
+  | 'marketing-assistant'
   | 'about'
   | 'assessment'
   | 'assistant'
@@ -113,7 +118,100 @@ export interface ActionPlanTask {
   priority: RecommendationPriority;
   status: TaskStatus;
   createdAt: string;
+  goalId?: string;
   isSample?: boolean;
+}
+
+export interface BusinessGoal {
+  id: string;
+  title: string;
+  category: string;
+  targetDate: string;
+  createdAt: string;
+  isSample?: boolean;
+}
+
+export interface CalculatorSnapshot {
+  initialInvestment: number;
+  monthlySalesRevenue: number;
+  monthlyOperatingExpenses: number;
+  productCost: number;
+  otherBusinessCosts: number;
+  totalMonthlyExpenses: number;
+  estimatedMonthlyProfit: number;
+  profitMarginPercent: number;
+  breakEvenMonthlySales: number;
+  paybackMonths: number | null;
+  updatedAt: string;
+}
+
+export interface IdeaFinderRequest {
+  budgetInr: number;
+  skillsAndInterests: string;
+  preferredBusinessType: string;
+  workSetting: 'Home-based' | 'Physical shop / studio' | 'Flexible (Home or Physical)';
+}
+
+export interface BusinessIdeaItem {
+  businessName: string;
+  shortDescription: string;
+  estimatedStartupInvestment: string;
+  targetCustomers: string;
+  requiredSkills: string[];
+  potentialChallenges: string[];
+  firstSteps: string[];
+}
+
+export interface IdeaFinderResponse {
+  ideas: BusinessIdeaItem[];
+  sourceNotes: ChatSourceNote[];
+  guidanceDisclaimer: string;
+}
+
+export interface BusinessPlanRequest {
+  businessIdea: string;
+  budgetInr: number;
+  location: string;
+  targetCustomers: string;
+  productsOrServices: string;
+}
+
+export interface BusinessPlanWeek {
+  weekLabel: string;
+  focus: string;
+  tasks: string[];
+}
+
+export interface BusinessPlanResponse {
+  businessTitle: string;
+  businessOverview: string;
+  productsOrServices: string[];
+  targetCustomers: string;
+  estimatedStartupCosts: string[];
+  marketingStrategy: string[];
+  businessChallenges: string[];
+  expectedExpenses: string[];
+  thirtyDayActionPlan: BusinessPlanWeek[];
+  sourceNotes: ChatSourceNote[];
+  guidanceDisclaimer: string;
+}
+
+export interface MarketingAssistantRequest {
+  businessName: string;
+  productOrService: string;
+  targetAudience: string;
+  platform: 'Instagram' | 'WhatsApp Business' | 'Facebook' | 'Local & Multi-platform';
+  toneNote?: string;
+}
+
+export interface MarketingAssistantResponse {
+  instagramCaptions: string[];
+  whatsappMessages: string[];
+  productDescriptions: Array<{ label: string; copy: string }>;
+  businessSlogans: string[];
+  marketingStrategies: string[];
+  sourceNotes: ChatSourceNote[];
+  guidanceDisclaimer: string;
 }
 
 export interface FeedbackSubmission {

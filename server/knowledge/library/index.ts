@@ -36,12 +36,24 @@ const DOCUMENT_SPECS: Array<{
   { docId: '06_business_faq', area: 'Business FAQ', fileName: '06_Business_FAQ.md' },
 ];
 
+function resolveKnowledgeFilePath(fileName: string): string {
+  const localPath = path.resolve(__dirname, fileName);
+  if (fs.existsSync(localPath)) {
+    return localPath;
+  }
+  const cwdPath = path.resolve(process.cwd(), 'server', 'knowledge', 'library', fileName);
+  if (fs.existsSync(cwdPath)) {
+    return cwdPath;
+  }
+  return localPath;
+}
+
 function parseMarkdownDocument(spec: {
   docId: string;
   area: string;
   fileName: string;
 }): { meta: KnowledgeDocumentMeta; chunks: KnowledgeChunk[] } {
-  const filePath = path.resolve(__dirname, spec.fileName);
+  const filePath = resolveKnowledgeFilePath(spec.fileName);
   const raw = fs.readFileSync(filePath, 'utf-8').replace(/\r\n/g, '\n');
 
   const titleMatch = raw.match(/^#\s+(.+)$/m);

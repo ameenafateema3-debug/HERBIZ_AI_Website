@@ -114,7 +114,7 @@ The chatbot should:
 2. Any totals, averages, rankings or charts derived from those records must be labelled as sample-data analysis.
 3. Do not infer that a real entrepreneur has a particular income, loan, location or business outcome from a sample record.
 4. Do not claim persistent user-data storage unless it has been implemented and tested.
-5. Do not claim live Power BI connectivity unless the report is actually embedded/connected and refresh behaviour has been tested.
+5. Do not claim live bank, GST portal, or external analytics sync unless an authorised integration has been connected and tested.
 6. Do not claim that the chatbot has submitted forms, contacted agencies, approved loans or verified eligibility unless a real, authorised integration has performed that action.
 7. Recommendations are suggestions for consideration, not guarantees of business success.
 

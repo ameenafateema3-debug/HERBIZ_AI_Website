@@ -98,9 +98,9 @@ Good practice:
 4. Tell users when content is generated or simulated if that distinction matters.
 5. Keep a human responsible for important business decisions.
 
-## 6. HERBIZ AI and Power BI honesty rules
+## 6. HERBIZ AI dashboard honesty rules
 
-The HERBIZ AI project may display a Power BI report or dashboard only if an actual report has been embedded or connected and tested. If the app currently shows a screenshot, mock-up, sample chart or manually entered figure, describe it accurately as a preview or sample—not a live Power BI connection.
+The HERBIZ AI dashboard displays figures calculated from user-entered data or clearly labelled sample previews. If the app shows a sample chart, mock-up, or manually entered figure, describe it accurately as a sample preview or user-entered estimate—not a live bank or accounting sync.
 
 The chatbot must not claim:
 - Data is automatically synchronised when no refresh integration exists.

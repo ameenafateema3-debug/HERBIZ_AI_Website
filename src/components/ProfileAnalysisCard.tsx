@@ -5,6 +5,7 @@ import type {
   ProfileAnalysisRequest,
   ProfileAnalysisResponse,
 } from '../types/herbiz';
+import { ApiRequestError, fetchJson } from '../utils/apiClient';
 
 interface ProfileAnalysisCardProps {
   profile: BusinessAssessment | null;
@@ -103,23 +104,16 @@ export default function ProfileAnalysisCard({
     };
 
     try {
-      const response = await fetch('/api/analyze-profile', {
+      const data = await fetchJson<ProfileAnalysisResponse>('/api/analyze-profile', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(minimalPayload),
       });
-      const data = await response.json();
-      if (!response.ok) {
-        if (Array.isArray(data.missingFields) && data.missingFields.length > 0) {
-          setMissingFields(data.missingFields);
-        }
-        throw new Error(
-          data.error || 'Gemini business profile analysis is currently unavailable.'
-        );
-      }
-      setResult(data as ProfileAnalysisResponse);
+      setResult(data);
     } catch (err: unknown) {
       setResult(null);
+      if (err instanceof ApiRequestError && err.missingFields && err.missingFields.length > 0) {
+        setMissingFields(err.missingFields);
+      }
       setErrorMsg(
         err instanceof Error
           ? err.message

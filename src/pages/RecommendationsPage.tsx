@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import type { PageId, RecommendationPriority, RecommendationResult } from '../types/herbiz';
 import { FICTIONAL_SAMPLE_PROFILE } from '../data/sampleDemoProfile';
+import { fetchJson } from '../utils/apiClient';
 
 interface RecommendationsPageProps {
   userRecommendation: RecommendationResult | null;
@@ -58,15 +59,13 @@ export default function RecommendationsPage({
       setLoadingDemo(true);
       setErrorMsg(null);
       try {
-        const res = await fetch('/api/recommendations', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(FICTIONAL_SAMPLE_PROFILE),
-        });
-        const data = await res.json();
-        if (!res.ok) {
-          throw new Error(data.error || 'Could not load sample recommendations.');
-        }
+        const data = await fetchJson<{ recommendation: RecommendationResult }>(
+          '/api/recommendations',
+          {
+            method: 'POST',
+            body: JSON.stringify(FICTIONAL_SAMPLE_PROFILE),
+          }
+        );
         if (!cancelled) {
           setDemoRecommendation(data.recommendation);
         }

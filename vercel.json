@@ -1,0 +1,14 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "api/**/*.ts": {
+      "includeFiles": "server/knowledge/library/*.md"
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/((?!api/|assets/|src/).*)",
+      "destination": "/index.html"
+    }
+  ]
+}
